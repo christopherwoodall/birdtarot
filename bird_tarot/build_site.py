@@ -7,7 +7,7 @@ embedded as a JS constant.
 
 Usage:
     bird-tarot-site
-    bird-tarot-site --cards cards.yml --meanings meanings.json --images ./site/cards --out ./site
+    bird-tarot-site --cards cards.yml --meanings meanings.json --images ./docs/cards --out ./docs
 """
 
 import argparse
@@ -20,8 +20,8 @@ ROOT = Path(__file__).resolve().parent.parent
 
 CARDS_YML = ROOT / "cards.yml"
 MEANINGS_JSON = ROOT / "meanings.json"
-IMAGES_DIR = ROOT / "site" / "cards"
-OUT_DIR = ROOT / "site"
+IMAGES_DIR = ROOT / "docs" / "cards"
+OUT_DIR = ROOT / "docs"
 
 
 # ---------------------------------------------------------------------------
@@ -58,13 +58,19 @@ def build_cards_json(card_ids: list[str], meanings: dict, images: set[str]) -> s
         m = meanings.get(cid, {})
         name = m.get("name", cid.replace("-", " ").title())
         meaning = m.get("upright", "")
-        entry: dict = {"slug": cid, "name": name, "meaning": meaning}
+        reversed_meaning = m.get("reversed", "")
+        entry: dict = {
+            "slug": cid,
+            "name": name,
+            "meaning": meaning,
+            "reversed": reversed_meaning,
+        }
         # keywords would go here if present in meanings.json
         kw = m.get("keywords")
         if kw:
             entry["keywords"] = kw
         cards.append(entry)
-    return json.dumps(cards, indent=2, ensure_ascii=False)
+    return json.dumps(cards, separators=(",", ":"), ensure_ascii=False)
 
 
 # ---------------------------------------------------------------------------
@@ -80,6 +86,13 @@ def html_template(cards_json: str) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bird Tarot</title>
 <meta name="description" content="Draw a card. Listen to the bird.">
+<meta property="og:title" content="Bird Tarot" />
+<meta property="og:description" content="78 North American birds. One reading waiting for you." />
+<meta property="og:image" content="https://birdtarot.com/social-preview.png" />
+<meta property="og:url" content="https://birdtarot.com" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://birdtarot.com/social-preview.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -292,9 +305,15 @@ a{{color:inherit;text-decoration:none}}
 .modal-name{{
   font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold);margin-bottom:.6rem;
 }}
+.modal-section-label{{
+  font-family:'Cinzel',serif;font-variant:small-caps;
+  color:var(--muted);font-size:.75rem;letter-spacing:.1em;
+  margin-top:.8rem;margin-bottom:.2rem;
+}}
 .modal-meaning{{
   font-family:'EB Garamond',serif;font-size:1rem;color:var(--text);line-height:1.6;
 }}
+.modal-reversed{{color:var(--muted)}}
 .modal-keywords{{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-top:.6rem}}
 
 /* ── Mobile ────────────────────────────────────────────────────────────── */
@@ -342,7 +361,10 @@ a{{color:inherit;text-decoration:none}}
     <img id="modalImg" src="" alt="">
     <div class="modal-position" id="modalPosition"></div>
     <div class="modal-name" id="modalName"></div>
+    <div class="modal-section-label" id="modalUprightLabel">Upright</div>
     <div class="modal-meaning" id="modalMeaning"></div>
+    <div class="modal-section-label" id="modalReversedLabel">Reversed</div>
+    <div class="modal-meaning modal-reversed" id="modalReversed"></div>
     <div class="modal-keywords" id="modalKeywords"></div>
   </div>
 </div>
@@ -391,6 +413,9 @@ const $modalImg = document.getElementById('modalImg');
 const $modalPosition = document.getElementById('modalPosition');
 const $modalName = document.getElementById('modalName');
 const $modalMeaning = document.getElementById('modalMeaning');
+const $modalUprightLabel = document.getElementById('modalUprightLabel');
+const $modalReversed = document.getElementById('modalReversed');
+const $modalReversedLabel = document.getElementById('modalReversedLabel');
 const $modalKeywords = document.getElementById('modalKeywords');
 
 // ── Utility ───────────────────────────────────────────────────────────────
@@ -684,6 +709,12 @@ async function drawThree() {{
   // Wait for last flip to finish
   await sleep(ms(600));
 
+  // Reveal upright meaning inline below each card
+  for (let i = 0; i < 3; i++) {{
+    if (i > 0) await sleep(ms(150));
+    revealSingleInfo(slots[i]);
+  }}
+
   // Make cards clickable for modal (three-card only)
   slots.forEach(slot => {{
     const openModal = () => {{
@@ -693,6 +724,9 @@ async function drawThree() {{
       $modalPosition.textContent = slot._positionLabel;
       $modalName.textContent = c.name;
       $modalMeaning.textContent = c.meaning || '';
+      $modalReversed.textContent = c.reversed || '';
+      $modalUprightLabel.style.display = c.meaning ? '' : 'none';
+      $modalReversedLabel.style.display = c.reversed ? '' : 'none';
       $modalKeywords.innerHTML = '';
       if (c.keywords && c.keywords.length) {{
         c.keywords.forEach(kw => {{
@@ -754,14 +788,14 @@ Published at [birdtarot.com](https://birdtarot.com).
   format_cards.py     Resize to tarot proportions, add gold banner
         │
         ▼
-./site/cards/         Formatted card PNGs (1024×1792)
+./docs/cards/         Formatted card PNGs (1024×1792)
         │
         ▼
   build_site.py       Merge cards.yml + meanings.json, embed in HTML
         │
         ▼
-./site/index.html     Single-page static site (all data inline)
-./site/CNAME          GitHub Pages custom domain
+./docs/index.html     Single-page static site (all data inline)
+./docs/CNAME          GitHub Pages custom domain
 ```
 
 ## Build
@@ -777,22 +811,22 @@ bird-tarot-site
 ## CLI Options
 
 ```
-bird-tarot-site --cards cards.yml --meanings meanings.json --images ./site/cards --out ./site
+bird-tarot-site --cards cards.yml --meanings meanings.json --images ./docs/cards --out ./docs
 ```
 
 | Flag         | Default          | Description                     |
 |-------------|------------------|---------------------------------|
 | `--cards`   | `cards.yml`      | Card definitions (ids + scenes) |
 | `--meanings`| `meanings.json`  | Display names and meanings      |
-| `--images`  | `./site/cards`   | Formatted card PNGs directory   |
-| `--out`     | `./site`         | Output directory for site files |
+| `--images`  | `./docs/cards`   | Formatted card PNGs directory   |
+| `--out`     | `./docs`         | Output directory for site files |
 
 ## What Gets Built
 
-- `site/index.html` — self-contained SPA with all card data embedded as JS
-- `site/cards/*.png` — formatted card images referenced by relative path
-- `site/CNAME` — custom domain for GitHub Pages
-- `site/README.md` — this file
+- `docs/index.html` — self-contained SPA with all card data embedded as JS
+- `docs/cards/*.png` — formatted card images referenced by relative path
+- `docs/CNAME` — custom domain for GitHub Pages
+- `docs/README.md` — this file
 """
 
 

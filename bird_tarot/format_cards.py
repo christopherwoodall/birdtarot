@@ -11,7 +11,7 @@ Layout:
 Usage:
     python format_cards.py                     # process all cards in ./cards/
     python format_cards.py --in ./cards        # explicit input dir
-    python format_cards.py --out ./site/cards  # explicit output dir
+    python format_cards.py --out ./docs/cards  # explicit output dir
     python format_cards.py --only 03-the-empress
 """
 
@@ -128,7 +128,7 @@ def main():
         "--out",
         dest="dst_dir",
         type=Path,
-        default=Path("site/cards"),
+        default=Path("docs/cards"),
         help="Output directory for formatted cards.",
     )
     parser.add_argument("--only", metavar="ID", help="Process a single card id.")
