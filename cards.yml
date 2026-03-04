@@ -1,0 +1,462 @@
+style: >-
+  Vintage botanical illustration style, gouache on cream-white textured paper,
+  a North American bird as the central figure replacing any human characters,
+  muted earth tones with rich jewel color accents, fine ink linework, gold leaf details,
+  tarot card composition with symbolic objects and environmental details, no text, no words,
+  no letters —
+
+cards:
+  # ── Major Arcana (22) ──────────────────────────────────────────────────────
+  - id: 00-the-fool
+    scene: >-
+      a cheerful Killdeer chick teetering on the edge of a rocky cliff at sunrise,
+      tiny bundle tied to a cattail reed over its wing, a butterfly ahead of it,
+      carefree and unaware of the drop below
+
+  - id: 01-the-magician
+    scene: >-
+      a Northern Mockingbird standing confidently on a stone altar table,
+      wings spread to reveal all four tarot suit symbols arranged before it — a wand, a cup, a sword, a pentacle coin —
+      one wing raised toward a glowing sky, vines of roses and lilies framing the scene
+
+  - id: 02-the-high-priestess
+    scene: >-
+      a Barred Owl seated between two great stone pillars draped in black and white cloth,
+      a crescent moon at her talons, a flowing lunar veil behind her,
+      an open scroll across her lap, serene and mysterious
+
+  - id: 03-the-empress
+    scene: >-
+      a resplendent female Wild Turkey seated on a lush throne of wheat and pomegranates,
+      surrounded by a fertile forest clearing, a golden shield with a Venus symbol beside her,
+      wildflowers blooming at her feet, abundant and warm
+
+  - id: 04-the-emperor
+    scene: >-
+      a Bald Eagle seated on a granite throne, a mountain range behind him,
+      an orb and scepter in each talon, full regal bearing, armor-like chest feathers,
+      rams carved into the throne arms
+
+  - id: 05-the-hierophant
+    scene: >-
+      a Great Horned Owl in ceremonial robes seated between two stone pillars,
+      two smaller birds kneeling before him receiving crossed keys,
+      stained-glass forest light filtering through ancient trees behind
+
+  - id: 06-the-lovers
+    scene: >-
+      a pair of Sandhill Cranes facing each other in a meadow, wings slightly open in a courtship dance,
+      an angelic Trumpeter Swan descending from golden clouds above blessing them,
+      an apple tree and a flaming tree flanking the scene
+
+  - id: 07-the-chariot
+    scene: >-
+      a Peregrine Falcon riding a stone chariot pulled by two smaller birds — one white dove, one black crow —
+      city skyline rushing past, armor-like breast feathers, star-crown of white spots on its head,
+      fierce and in absolute control
+
+  - id: 08-strength
+    scene: >-
+      a Great Blue Heron gently and calmly holding open the jaws of a large snapping turtle,
+      no aggression, pure composed grace, a lemniscate infinity symbol floating above its head,
+      soft meadow and wildflowers surrounding the scene
+
+  - id: 09-the-hermit
+    scene: >-
+      a Great Gray Owl alone on a snowy mountain peak at night, holding a lantern made of a mason jar
+      with a single star glowing inside, long pilgrim's cloak of feathers,
+      gazing down into a dark valley below
+
+  - id: 10-wheel-of-fortune
+    scene: >-
+      a large wooden wheel inscribed with celestial symbols turning in the sky above a marsh,
+      a Purple Martin at the top ascending, a Sharp-shinned Hawk on one side descending,
+      a Screech Owl at the bottom, a Red-tailed Hawk sphinx-like at the center, storm clouds parting
+
+  - id: 11-justice
+    scene: >-
+      an Osprey seated on a formal wooden throne in a judge's chamber,
+      holding a fish in one talon balanced like scales, a sword in the other talon raised upright,
+      wearing a regal crown of river reeds, severe and exact
+
+  - id: 12-the-hanged-man
+    scene: >-
+      a Red-breasted Nuthatch hanging upside-down by one leg from a wooden T-shaped gibbet,
+      perfectly serene, a golden halo of light around its head, free wing spread in surrender,
+      tree roots and sky trading places
+
+  - id: 13-death
+    scene: >-
+      a Turkey Vulture in black armor riding a pale horse skeleton across a field of fallen feathers,
+      a great bishop heron kneeling in prayer before it, the sun rising between dark stone towers in the distance,
+      a river and distant boats in the background
+
+  - id: 14-temperance
+    scene: >-
+      an elegant Wood Duck standing at the edge of a glassy pond, carefully pouring water
+      between two golden cups without spilling a drop, one foot on land one in water,
+      an iris flower growing beside it, a winding path and mountains at golden hour behind
+
+  - id: 15-the-devil
+    scene: >-
+      a Common Raven perched on a black obsidian altar above two smaller chained birds —
+      a starling and a grackle — chains loose enough to remove but never questioned,
+      an inverted pentacle above the raven's head, torchlight and shadow, gleeful and sinister
+
+  - id: 16-the-tower
+    scene: >-
+      a stone lighthouse tower struck by a massive lightning bolt, a Great Blue Heron
+      launching violently from the crumbling crown, a smaller bird falling through the air below,
+      stormy dark sea and electric sky, fire bursting from the tower windows
+
+  - id: 17-the-star
+    scene: >-
+      an Indigo Bunting kneeling at the edge of a calm pond at night,
+      pouring water from two vessels — one into the pond, one onto the earth —
+      a massive central star and seven smaller stars blazing above, deep blue sky,
+      a distant white ibis perched on a tree silhouette
+
+  - id: 18-the-moon
+    scene: >-
+      an Eastern Screech Owl howling at a full moon with a strange face on it,
+      a lobster or crayfish crawling from a dark swamp below, two Great Horned Owls
+      flanking stone towers on either side, a worn path disappearing into distant mountains, eerie silver light
+
+  - id: 19-the-sun
+    scene: >-
+      an American Goldfinch riding joyfully on the back of a white dove, both soaring
+      in front of an enormous blazing golden sun, sunflowers below,
+      a stone wall with a red banner, pure joy and radiant warmth, brilliant yellow and gold tones
+
+  - id: 20-judgement
+    scene: >-
+      a great Whooping Crane descending from parted stormclouds like an angel,
+      wings enormous and white, blowing a long curved trumpet,
+      below it three smaller birds — a pelican, a cormorant, a heron — rising from cattail reeds
+      with wings spread in resurrection, deep blue water and dawn sky
+
+  - id: 21-the-world
+    scene: >-
+      a Ruby-throated Hummingbird hovering at the center of a great laurel wreath tied with red ribbons,
+      dancing in midair, holding a small flowering wand in each foot,
+      in each corner of the image: an eagle, an ox-bird, a lion-bird, and an angel-bird watching,
+      cosmic starfield background
+
+  # ── Wands — Fire / Passion / Creativity — Woodpeckers and forest birds ─────
+  - id: ace-of-wands
+    scene: >-
+      a single living wooden wand held in a large talon emerging from a stormcloud,
+      leaves and small flames bursting from the tip, a Pileated Woodpecker perched on it,
+      a fertile valley and castle in the distance below
+
+  - id: two-of-wands
+    scene: >-
+      a Red-headed Woodpecker standing atop a stone parapet holding a globe in one talon
+      and a tall wooden wand in the other, a second wand mounted behind it,
+      gazing out over a vast wooded valley toward distant mountains
+
+  - id: three-of-wands
+    scene: >-
+      a Baltimore Oriole standing on a rocky bluff at sunset, three wands planted in the earth beside it,
+      watching three sailing ships depart across a wide golden bay below
+
+  - id: four-of-wands
+    scene: >-
+      four wands planted in a garden forming a floral canopy,
+      a pair of Cedar Waxwings dancing beneath it carrying berry garlands,
+      a grand manor house in the background, celebration and harvest abundance
+
+  - id: five-of-wands
+    scene: >-
+      five House Sparrows in chaotic mid-air skirmish, each clutching a wand and jousting with it,
+      feathers flying, no clear winner, a bright open sky
+
+  - id: six-of-wands
+    scene: >-
+      a Red-winged Blackbird riding a horse made of braided cattail reeds in a victory parade,
+      wearing a laurel wreath, holding a tall wand with a victory crown,
+      crowds of smaller birds cheering on either side
+
+  - id: seven-of-wands
+    scene: >-
+      a Northern Mockingbird on a high rocky ledge defiantly defending its position
+      with a wand against six wands thrusting up from below from unseen challengers,
+      fierce and sure-footed
+
+  - id: eight-of-wands
+    scene: >-
+      eight flaming wooden wands arcing in a perfect formation across a clear blue sky
+      above a blooming meadow, a Purple Martin diving alongside them at full speed
+
+  - id: nine-of-wands
+    scene: >-
+      a battle-worn Downy Woodpecker leaning wearily on a wand, bandaged wing,
+      eight wands planted in a row behind it like a fence, watching the horizon with exhausted vigilance
+
+  - id: ten-of-wands
+    scene: >-
+      an American Robin struggling to carry an enormous burden of ten wands,
+      leaning forward under the weight, a distant farmhouse visible, nearly there but clearly exhausted
+
+  - id: page-of-wands
+    scene: >-
+      a young Northern Flicker in a tunic of spotted feathers standing in a desert landscape,
+      holding a tall leafy wand upright and studying a salamander climbing it with wide curious eyes
+
+  - id: knight-of-wands
+    scene: >-
+      a Ruby-throated Hummingbird on a charging rearing horse, armor of iridescent green,
+      holding a flowering wand, pyramids and a dusty desert behind, full gallop and pure energy
+
+  - id: queen-of-wands
+    scene: >-
+      a female Pileated Woodpecker on a sunlit wooden throne carved with lions and sunflowers,
+      holding a tall wand in one talon and a sunflower in the other, a black cat at her feet,
+      regal and warm
+
+  - id: king-of-wands
+    scene: >-
+      a male Pileated Woodpecker on a carved wooden throne decorated with salamanders and lions,
+      wearing a flame-colored cape, holding a wand with budding leaves, small lizard at his feet,
+      powerful and commanding
+
+  # ── Cups — Water / Emotion / Intuition — Water birds ──────────────────────
+  - id: ace-of-cups
+    scene: >-
+      an enormous golden chalice overflowing with water held by a large white wing emerging from clouds,
+      a Great Blue Heron perched on the rim, five streams pouring from it into a lily-covered pond below,
+      a dove descending with a wafer
+
+  - id: two-of-cups
+    scene: >-
+      a pair of Trumpeter Swans facing each other across two golden cups,
+      necks curved to form a heart, a caduceus winged staff between them, a wreath of flowers above
+
+  - id: three-of-cups
+    scene: >-
+      three Wood Ducks dancing in a circle on a lily pad, each raising a golden cup,
+      autumn harvest of fruit and flowers around them, joyful celebration
+
+  - id: four-of-cups
+    scene: >-
+      a Great Egret sitting cross-legged under a tree with three cups before it,
+      arms folded, looking sullen and disinterested,
+      a fourth cup offered from a white cloud-wing that the egret ignores
+
+  - id: five-of-cups
+    scene: >-
+      a Common Loon in a black cloak staring mournfully at three spilled cups,
+      back turned to two remaining upright cups behind it,
+      a stone bridge over a river in the distance, gray sky
+
+  - id: six-of-cups
+    scene: >-
+      two young Mallard ducklings in a flower garden, the elder handing the smaller one
+      a cup filled with white flowers, five more cups of blooms on pedestals around them,
+      nostalgic golden-hour warmth
+
+  - id: seven-of-cups
+    scene: >-
+      a Snowy Egret silhouetted against a twilight sky gazing up at seven glowing cups
+      floating in clouds, each containing a different vision: a castle, a serpent, jewels, a wreath,
+      a small dragon, a veiled figure, a radiant bird
+
+  - id: eight-of-cups
+    scene: >-
+      a Sandhill Crane walking away at night through shallow water, leaving eight cups
+      neatly stacked behind it on a sandbar, a crescent moon between two mountain peaks,
+      turning its back on what was
+
+  - id: nine-of-cups
+    scene: >-
+      a plump Roseate Spoonbill seated contentedly on a bench, wings folded, grinning,
+      nine golden cups displayed on a curved shelf behind it, pure self-satisfied abundance
+
+  - id: ten-of-cups
+    scene: >-
+      a Canada Goose family at a cottage on a lakeside, two adult geese and goslings,
+      wings raised toward ten golden cups arranged in a rainbow arc overhead,
+      perfect domestic bliss and rolling green hills
+
+  - id: page-of-cups
+    scene: >-
+      a young Belted Kingfisher in a tunic of blue and rust, holding a golden cup
+      from which a small fish pokes its head up in surprise, standing by the sea, curious and delighted
+
+  - id: knight-of-cups
+    scene: >-
+      a Great Blue Heron in silver armor riding a white horse across a shallow desert stream,
+      solemnly offering a golden cup forward, wings folded, dignified and romantic
+
+  - id: queen-of-cups
+    scene: >-
+      a Common Loon on an ornate throne at the water's edge, holding an elaborate covered golden cup
+      and gazing into it dreamily, the throne carved with fish and water nymphs,
+      pebbled shoreline and calm reflective water
+
+  - id: king-of-cups
+    scene: >-
+      a Brown Pelican on a stone throne rising from the open sea, holding a cup in one wing
+      and a scepter in the other, a fish jumping in the water beside him,
+      a ship and a dolphin in background, vast and emotionally steady
+
+  # ── Swords — Air / Intellect / Conflict — Raptors ────────────────────────
+  - id: ace-of-swords
+    scene: >-
+      a single gleaming sword held upright in a large talon bursting through a stormcloud,
+      a crown of laurel and a palm frond hanging from its tip, a Peregrine Falcon gripping it,
+      jagged mountains below
+
+  - id: two-of-swords
+    scene: >-
+      a Barn Owl seated on a stone bench, blindfolded, arms crossed over its chest holding
+      two long swords crossed, a crescent moon reflecting on still dark water behind it, tense standoff
+
+  - id: three-of-swords
+    scene: >-
+      a Mourning Dove heart-shaped form with three long swords piercing through it,
+      heavy gray rain clouds and falling rain behind, grief and heartbreak
+
+  - id: four-of-swords
+    scene: >-
+      a Red-tailed Hawk lying in effigy on a stone tomb in a cathedral, wings folded in repose,
+      three swords hanging on the wall above and one sword along the side of the tomb,
+      a stained-glass forest window
+
+  - id: five-of-swords
+    scene: >-
+      a smirking Cooper's Hawk gathering three swords from the ground,
+      two defeated smaller birds walking away in the background with heads bowed,
+      a turbulent sea and torn clouds, hollow victory
+
+  - id: six-of-swords
+    scene: >-
+      a Blue Jay ferryman poling a small wooden boat across still water,
+      a smaller bird and a fledgling sitting huddled in the bow, six swords planted upright in the prow,
+      leaving choppy water, moving toward calm
+
+  - id: seven-of-swords
+    scene: >-
+      an American Crow sneaking away from a military camp at night on tiptoes,
+      five swords tucked under its wings, two swords left planted in the ground behind it,
+      a look back over its shoulder, campfire tents in the background
+
+  - id: eight-of-swords
+    scene: >-
+      a Northern Harrier standing bound and blindfolded, eight swords planted in a semicircle
+      around it like a cage, a dark castle behind, muddy waterlogged ground,
+      the ropes are loose — freedom is possible but the bird cannot see
+
+  - id: nine-of-swords
+    scene: >-
+      an Eastern Screech Owl bolt upright in bed with wings covering its face in anguish,
+      nine swords mounted in a row on the dark wall above it, a quilt with astrological symbols,
+      pure 3am dread
+
+  - id: ten-of-swords
+    scene: >-
+      a Sharp-shinned Hawk lying flat and still on a barren shore, ten swords around it,
+      a golden sunrise on the horizon over dark water, the worst has passed
+
+  - id: page-of-swords
+    scene: >-
+      a young American Kestrel standing alert on a windswept hill, holding a sword upright,
+      hair and feathers blown sideways, storm clouds rushing overhead, ready for anything
+
+  - id: knight-of-swords
+    scene: >-
+      a Merlin in full plate armor charging on a galloping horse directly into a fierce storm,
+      sword raised overhead, trees bending sideways in the gale, pure momentum and recklessness
+
+  - id: queen-of-swords
+    scene: >-
+      a Red-shouldered Hawk on a cloud-throne holding a sword straight up in one talon
+      and gesturing outward with the other, a butterfly carved on the throne armrest,
+      storm clouds parting around her, sharp-minded and clear
+
+  - id: king-of-swords
+    scene: >-
+      a Golden Eagle on a stone throne, sword held upright and forward,
+      wearing a blue cloak and crown, storm clouds and sylphs swirling behind,
+      butterflies on the throne carved in stone, absolute authority and judgment
+
+  # ── Pentacles — Earth / Material / Practical — Ground birds, seed eaters ──
+  - id: ace-of-pentacles
+    scene: >-
+      a large white-feathered talon emerging from a lush golden cloud holding a single glowing pentacle coin,
+      a Wild Turkey standing below it, a flowering garden archway leading to distant mountains
+
+  - id: two-of-pentacles
+    scene: >-
+      an American Robin juggling two large pentacle coins wrapped in an infinity lemniscate ribbon,
+      dancing on one foot at a dockside, stormy ships riding tall waves in the harbor behind
+
+  - id: three-of-pentacles
+    scene: >-
+      a White-breasted Nuthatch, a Black-capped Chickadee, and a Tufted Titmouse working together
+      inside a cathedral under construction, one reviewing stone-carved plans,
+      three pentacle coins set into the arched stonework above them, artisan collaboration
+
+  - id: four-of-pentacles
+    scene: >-
+      a House Sparrow seated on a stone wall in a city, clutching one pentacle coin tightly to its chest,
+      one coin under each foot, one balanced on its head, hoarding and fearful of loss
+
+  - id: five-of-pentacles
+    scene: >-
+      two Dark-eyed Juncos huddled together in a snowstorm, one limping, ragged and cold,
+      passing beneath a stained-glass church window glowing warmly with five pentacle coins,
+      destitute but not without hope
+
+  - id: six-of-pentacles
+    scene: >-
+      a Black-capped Chickadee merchant in fine coat holding a balance scale,
+      giving seeds from one pouch to two kneeling smaller birds — a House Finch and a Pine Siskin —
+      six pentacle coins arranged above, generosity and inequality
+
+  - id: seven-of-pentacles
+    scene: >-
+      a Ruffed Grouse leaning on a wooden staff, pausing to look at seven pentacle coins
+      growing like fruit from a lush leafy vine it has been tending, evaluating the harvest, patient labor
+
+  - id: eight-of-pentacles
+    scene: >-
+      a White-breasted Nuthatch seated at a wooden workbench carving pentacle coins one by one,
+      six finished coins mounted on the wall behind it, one in its lap, one ready to start,
+      a distant town through the window, diligent apprenticeship
+
+  - id: nine-of-pentacles
+    scene: >-
+      a Spotted Towhee in an elegant gown standing in a lush private vineyard garden,
+      one talon resting on a hooded falcon, nine pentacle coins hanging from vines around it,
+      a stone manor in the background, self-made abundance
+
+  - id: ten-of-pentacles
+    scene: >-
+      a Northern Bobwhite patriarch watching a family scene — adult pairs and fledglings —
+      in a prosperous estate courtyard, ten pentacle coins arranged in the Tree of Life pattern
+      in the archway above them, multi-generational legacy
+
+  - id: page-of-pentacles
+    scene: >-
+      a young White-crowned Sparrow in a blooming meadow, holding a single large pentacle coin up
+      and studying it carefully in the light, mountains in the background,
+      eager young student of the material world
+
+  - id: knight-of-pentacles
+    scene: >-
+      a Ring-necked Pheasant in dark armor seated on a heavy draft horse standing perfectly still
+      in a plowed field, holding a pentacle coin and studying it deliberately,
+      methodical and reliable, not rushing
+
+  - id: queen-of-pentacles
+    scene: >-
+      a Wild Turkey hen on a throne covered in vines and carved with rabbits and fruit,
+      cradling a golden pentacle coin tenderly in her lap, surrounded by lush garden,
+      a rabbit at her feet, nurturing and grounded
+
+  - id: king-of-pentacles
+    scene: >-
+      a male Ruffed Grouse on a throne embedded in vines and stone walls,
+      draped in a fur-trimmed robe patterned with grapes and bulls, one talon resting on a golden pentacle,
+      a thriving castle estate behind, master of the material world

@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bird-tarot"
+version = "0.1.0"
+description = "Generate all 78 tarot cards using AI image models, themed around North American birds."
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# uv sync --extra api
+api = [
+    "openai>=1.0",
+    "requests>=2.31",
+]
+# uv sync --extra local
+local = [
+    "torch>=2.7.0.dev0",
+    "diffusers>=0.30",
+    "transformers>=4.44",
+    "accelerate>=0.33",
+    "sentencepiece>=0.2",
+    "pillow>=10.0",
+]
+
+[project.scripts]
+bird-tarot       = "bird_tarot.generate:main"
+bird-tarot-local = "bird_tarot.generate_local:main"
+bird-tarot-read   = "bird_tarot.read:main"
+bird-tarot-format = "bird_tarot.format_cards:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["bird_tarot"]
+
+[tool.uv]
+# Nightly torch pins triton to a specific git hash uv can't resolve.
+# This overrides that pin to accept any compatible version.
+override-dependencies = [
+    "triton>=3.0; sys_platform == 'linux'",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-nightly-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-nightly-cu128"
+url = "https://download.pytorch.org/whl/nightly/cu128"
+explicit = true
