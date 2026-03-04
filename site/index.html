@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bird Tarot</title>
+<meta name="description" content="Draw a card. Listen to the bird.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & base ──────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  background:#0d0d0f;color:#e8e0d0;
+  font-family:'EB Garamond',Georgia,serif;
+  min-height:100vh;overflow-x:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+a{color:inherit;text-decoration:none}
+
+/* ── Palette vars ──────────────────────────────────────────────────────── */
+:root{
+  --bg:#0d0d0f;--surface:#16161a;--text:#e8e0d0;
+  --gold:#c9a84c;--violet:#7c6fcd;--muted:#6b6478;
+  --pill-bg:#1e1e26;--pill-text:#7c6fcd;
+}
+
+/* ── Canvas (particle layer) ───────────────────────────────────────────── */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── Layout shells ─────────────────────────────────────────────────────── */
+.screen{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;width:100%;padding:2rem 1rem;
+  transition:opacity .4s ease,transform .4s ease;
+}
+.screen.hidden{display:none}
+.screen.fade-out{opacity:0;transform:translateY(-12px);pointer-events:none}
+.screen.fade-in{opacity:1;transform:translateY(0)}
+
+/* ── State 1: Home ─────────────────────────────────────────────────────── */
+#home{text-align:center}
+.title{
+  font-family:'Cinzel',serif;font-size:clamp(2.6rem,8vw,4.8rem);
+  color:var(--gold);letter-spacing:.06em;line-height:1.15;
+  margin-bottom:.4rem;
+}
+.title .char{display:inline-block;opacity:0;transform:translateY(12px)}
+.title .char.visible{opacity:1;transform:translateY(0);transition:opacity .32s ease,transform .32s ease}
+.subtitle{
+  font-family:'EB Garamond',serif;font-variant:small-caps;
+  color:var(--muted);font-size:1.15rem;letter-spacing:.08em;
+  opacity:0;transition:opacity .4s ease;margin-bottom:2.4rem;
+}
+.subtitle.visible{opacity:1}
+.btn-row{display:flex;gap:1.2rem;opacity:0;transition:opacity .3s ease}
+.btn-row.visible{opacity:1}
+
+.draw-btn{
+  font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.12em;
+  color:var(--gold);border:1.5px solid var(--gold);
+  background:transparent;padding:.85rem 2.2rem;border-radius:4px;
+  position:relative;overflow:hidden;transition:color .2s ease,background .2s ease;
+  min-width:140px;min-height:44px;
+}
+.draw-btn:hover,.draw-btn:focus-visible{background:var(--gold);color:var(--bg)}
+
+/* shimmer pseudo */
+.draw-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(201,168,76,.25) 50%,transparent 60%);
+  transform:translateX(-100%);pointer-events:none;
+}
+@media(prefers-reduced-motion:no-preference){
+  .draw-btn:hover::after{animation:shimmer .4s ease forwards}
+}
+@keyframes shimmer{to{transform:translateX(100%)}}
+
+/* ── Cards ─────────────────────────────────────────────────────────────── */
+.spread{display:flex;gap:1.6rem;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-top:1.2rem}
+.card-slot{
+  perspective:900px;display:flex;flex-direction:column;align-items:center;
+  opacity:0;transform:translateY(20px);
+}
+.card-slot.dealt{opacity:1;transform:translateY(0);transition:opacity .35s ease,transform .35s ease}
+.position-label{
+  font-family:'Cinzel',serif;font-variant:small-caps;
+  color:var(--muted);font-size:.82rem;letter-spacing:.1em;
+  margin-bottom:.5rem;min-height:1.2em;
+}
+
+.card-inner{
+  width:220px;height:385px;position:relative;
+  transform-style:preserve-3d;cursor:pointer;
+  border-radius:8px;
+  transition:transform .6s ease;
+}
+.card-inner.flipped{transform:rotateY(180deg)}
+.card-inner.lifting{transform:translateY(-8px)}
+.card-inner.flipped.landed{
+  transform:rotateY(180deg) translateY(-4px);
+}
+
+/* breathing idle */
+@media(prefers-reduced-motion:no-preference){
+  .card-inner:not(.flipped):not(.lifting){animation:breathe 3s ease-in-out infinite}
+}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
+
+/* gold pulse on land */
+@media(prefers-reduced-motion:no-preference){
+  .card-inner.pulse{animation:goldpulse .6s ease-out forwards}
+}
+@keyframes goldpulse{
+  0%{box-shadow:0 0 0 rgba(201,168,76,0)}
+  30%{box-shadow:0 0 40px rgba(201,168,76,.4)}
+  100%{box-shadow:0 0 12px rgba(201,168,76,.15)}
+}
+
+.card-face{
+  position:absolute;inset:0;border-radius:8px;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  overflow:hidden;
+}
+
+/* ── Card back (CSS/SVG feather pattern) ───────────────────────────────── */
+.card-back{
+  background:var(--surface);
+  border:1.5px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+}
+.card-back svg{width:100%;height:100%;opacity:.55}
+
+/* ── Card front ────────────────────────────────────────────────────────── */
+.card-front{
+  transform:rotateY(180deg);
+  background:var(--surface);
+  border:1.5px solid var(--gold);
+}
+.card-front img{
+  width:100%;height:100%;object-fit:cover;display:block;border-radius:7px;
+}
+
+/* revealed card lift + glow */
+.card-inner.flipped.landed .card-front{
+  box-shadow:0 0 32px rgba(124,111,205,.35);
+}
+
+/* ── Card info (below card) ────────────────────────────────────────────── */
+.card-info{text-align:center;max-width:280px;margin-top:.8rem}
+.card-name{
+  font-family:'Cinzel',serif;font-size:1.15rem;color:var(--gold);
+  opacity:0;transform:translateY(6px);
+  transition:opacity .2s ease,transform .2s ease;
+}
+.card-name.visible{opacity:1;transform:translateY(0)}
+.card-meaning{
+  font-family:'EB Garamond',serif;font-size:.97rem;color:var(--text);
+  line-height:1.55;margin-top:.4rem;
+}
+.card-meaning .line{
+  display:block;opacity:0;transform:translateY(8px);
+  transition:opacity .3s ease,transform .3s ease;
+}
+.card-meaning .line.visible{opacity:1;transform:translateY(0)}
+
+.card-keywords{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-top:.5rem}
+.pill{
+  font-family:'EB Garamond',serif;font-size:.78rem;
+  background:var(--pill-bg);color:var(--pill-text);
+  padding:.18rem .65rem;border-radius:20px;
+  opacity:0;transform:scale(.8);
+  transition:opacity .2s ease,transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.pill.visible{opacity:1;transform:scale(1)}
+
+/* ── Start over link ───────────────────────────────────────────────────── */
+.start-over{
+  font-family:'EB Garamond',serif;font-size:.95rem;
+  color:var(--muted);margin-top:2rem;
+  opacity:0;transition:opacity .5s ease,color .2s ease;
+  cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:.35rem;
+}
+.start-over.visible{opacity:1}
+.start-over:hover{color:var(--gold)}
+.start-over .arrow{display:inline-block;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.start-over:hover .arrow{transform:rotate(-20deg)}
+
+/* ── Modal ─────────────────────────────────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,.82);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .28s ease;
+  padding:1rem;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal-panel{
+  background:var(--surface);border:1.5px solid var(--gold);
+  border-radius:10px;max-width:420px;width:100%;
+  padding:1.6rem;text-align:center;
+  transform:scale(.94) translateY(10px);
+  transition:transform .28s ease-out,opacity .28s ease-out;
+  opacity:0;
+}
+.modal-overlay.open .modal-panel{transform:scale(1) translateY(0);opacity:1}
+.modal-panel img{width:100%;border-radius:6px;margin-bottom:1rem}
+.modal-position{
+  font-family:'Cinzel',serif;font-variant:small-caps;
+  color:var(--muted);font-size:.82rem;letter-spacing:.1em;margin-bottom:.3rem;
+}
+.modal-name{
+  font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold);margin-bottom:.6rem;
+}
+.modal-meaning{
+  font-family:'EB Garamond',serif;font-size:1rem;color:var(--text);line-height:1.6;
+}
+.modal-keywords{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-top:.6rem}
+
+/* ── Mobile ────────────────────────────────────────────────────────────── */
+@media(max-width:740px){
+  .spread{flex-direction:column;align-items:center}
+  .card-inner{width:200px;height:350px}
+  .modal-panel{max-width:calc(100vw - 32px)}
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+  .title .char{opacity:1;transform:none}
+  .subtitle,.btn-row{opacity:1}
+}
+</style>
+</head>
+<body>
+
+<!-- Particle canvas -->
+<canvas id="particles"></canvas>
+
+<!-- ── State 1: Home ───────────────────────────────────────────────────── -->
+<div id="home" class="screen">
+  <h1 class="title" id="title"></h1>
+  <p class="subtitle" id="subtitle">draw a card. listen to the bird.</p>
+  <div class="btn-row" id="btnRow">
+    <button class="draw-btn" id="drawOne">Draw One</button>
+    <button class="draw-btn" id="drawThree">Draw Three</button>
+  </div>
+</div>
+
+<!-- ── State 2: Reading ────────────────────────────────────────────────── -->
+<div id="reading" class="screen hidden">
+  <div class="spread" id="spread"></div>
+  <div class="start-over" id="startOver"><span class="arrow">&#8617;</span> start over</div>
+</div>
+
+<!-- ── Modal (three-card detail) ───────────────────────────────────────── -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-panel" id="modalPanel">
+    <img id="modalImg" src="" alt="">
+    <div class="modal-position" id="modalPosition"></div>
+    <div class="modal-name" id="modalName"></div>
+    <div class="modal-meaning" id="modalMeaning"></div>
+    <div class="modal-keywords" id="modalKeywords"></div>
+  </div>
+</div>
+
+<!-- Card back SVG pattern (hidden, cloned into cards) -->
+<svg id="cardBackSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 385" style="display:none">
+  <defs>
+    <pattern id="featherPat" x="0" y="0" width="28" height="32" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
+      <path d="M14 2 C14 2 8 10 8 18 C8 24 11 28 14 30 C17 28 20 24 20 18 C20 10 14 2 14 2Z"
+            fill="none" stroke="#1e1e26" stroke-width="1" opacity=".6"/>
+      <line x1="14" y1="6" x2="14" y2="28" stroke="#1e1e26" stroke-width=".5" opacity=".4"/>
+      <line x1="10" y1="14" x2="14" y2="18" stroke="#1e1e26" stroke-width=".4" opacity=".3"/>
+      <line x1="18" y1="14" x2="14" y2="18" stroke="#1e1e26" stroke-width=".4" opacity=".3"/>
+      <line x1="10" y1="20" x2="14" y2="23" stroke="#1e1e26" stroke-width=".4" opacity=".3"/>
+      <line x1="18" y1="20" x2="14" y2="23" stroke="#1e1e26" stroke-width=".4" opacity=".3"/>
+    </pattern>
+  </defs>
+  <rect width="220" height="385" fill="#16161a"/>
+  <rect width="220" height="385" fill="url(#featherPat)"/>
+  <rect x="8" y="8" width="204" height="369" rx="4" fill="none" stroke="#c9a84c" stroke-width="1" opacity=".5"/>
+  <rect x="12" y="12" width="196" height="361" rx="3" fill="none" stroke="#c9a84c" stroke-width=".5" opacity=".3"/>
+  <!-- Central decorative diamond -->
+  <g transform="translate(110,192)" opacity=".35">
+    <polygon points="0,-30 18,0 0,30 -18,0" fill="none" stroke="#c9a84c" stroke-width="1"/>
+    <polygon points="0,-18 10,0 0,18 -10,0" fill="none" stroke="#c9a84c" stroke-width=".7"/>
+    <circle cx="0" cy="0" r="3" fill="#c9a84c" opacity=".5"/>
+  </g>
+</svg>
+
+<script>
+// ── Card data (embedded at build time) ────────────────────────────────────
+const CARDS = [
+  {
+    "slug": "00-the-fool",
+    "name": "The Fool",
+    "meaning": "New beginnings, innocence, spontaneity, free spirit, leaping into the unknown"
+  },
+  {
+    "slug": "01-the-magician",
+    "name": "The Magician",
+    "meaning": "Manifestation, resourcefulness, power, inspired action, skill"
+  },
+  {
+    "slug": "02-the-high-priestess",
+    "name": "The High Priestess",
+    "meaning": "Intuition, sacred knowledge, divine feminine, subconscious mind, inner voice"
+  },
+  {
+    "slug": "03-the-empress",
+    "name": "The Empress",
+    "meaning": "Femininity, beauty, nature, nurturing, abundance, fertility, creation"
+  },
+  {
+    "slug": "04-the-emperor",
+    "name": "The Emperor",
+    "meaning": "Authority, structure, control, fatherhood, stability, leadership"
+  },
+  {
+    "slug": "05-the-hierophant",
+    "name": "The Hierophant",
+    "meaning": "Tradition, conformity, morality, institutions, spiritual wisdom, mentorship"
+  },
+  {
+    "slug": "06-the-lovers",
+    "name": "The Lovers",
+    "meaning": "Love, harmony, relationships, values alignment, choices, union"
+  },
+  {
+    "slug": "07-the-chariot",
+    "name": "The Chariot",
+    "meaning": "Control, willpower, success, determination, direction, victory"
+  },
+  {
+    "slug": "08-strength",
+    "name": "Strength",
+    "meaning": "Courage, persuasion, patience, inner strength, compassion, soft control"
+  },
+  {
+    "slug": "09-the-hermit",
+    "name": "The Hermit",
+    "meaning": "Soul-searching, introspection, solitude, inner guidance, withdrawal"
+  },
+  {
+    "slug": "10-wheel-of-fortune",
+    "name": "Wheel of Fortune",
+    "meaning": "Good luck, karma, life cycles, destiny, turning point, fate"
+  },
+  {
+    "slug": "11-justice",
+    "name": "Justice",
+    "meaning": "Fairness, truth, cause and effect, law, accountability, clarity"
+  },
+  {
+    "slug": "12-the-hanged-man",
+    "name": "The Hanged Man",
+    "meaning": "Suspension, restriction, letting go, sacrifice, new perspectives, surrender"
+  },
+  {
+    "slug": "13-death",
+    "name": "Death",
+    "meaning": "End of a cycle, transition, letting go, transformation, change"
+  },
+  {
+    "slug": "14-temperance",
+    "name": "Temperance",
+    "meaning": "Balance, moderation, patience, purpose, meaning, middle path"
+  },
+  {
+    "slug": "15-the-devil",
+    "name": "The Devil",
+    "meaning": "Bondage, addiction, materialism, shadow self, dependency, restriction"
+  },
+  {
+    "slug": "16-the-tower",
+    "name": "The Tower",
+    "meaning": "Sudden change, upheaval, chaos, revelation, destruction of false structures"
+  },
+  {
+    "slug": "17-the-star",
+    "name": "The Star",
+    "meaning": "Hope, faith, purpose, renewal, spirituality, serenity, inspiration"
+  },
+  {
+    "slug": "18-the-moon",
+    "name": "The Moon",
+    "meaning": "Illusion, fear, the unconscious, confusion, complexity, subconscious"
+  },
+  {
+    "slug": "19-the-sun",
+    "name": "The Sun",
+    "meaning": "Positivity, joy, vitality, success, optimism, abundance, clarity"
+  },
+  {
+    "slug": "20-judgement",
+    "name": "Judgement",
+    "meaning": "Reflection, reckoning, awakening, absolution, renewal, inner calling"
+  },
+  {
+    "slug": "21-the-world",
+    "name": "The World",
+    "meaning": "Completion, integration, accomplishment, travel, wholeness, fulfillment"
+  },
+  {
+    "slug": "ace-of-wands",
+    "name": "Ace of Wands",
+    "meaning": "Inspiration, new opportunity, growth, potential, spark of energy"
+  },
+  {
+    "slug": "two-of-wands",
+    "name": "Two of Wands",
+    "meaning": "Future planning, discovery, decisions, personal power, boldness"
+  },
+  {
+    "slug": "three-of-wands",
+    "name": "Three of Wands",
+    "meaning": "Expansion, foresight, overseas opportunities, looking ahead, leadership"
+  },
+  {
+    "slug": "four-of-wands",
+    "name": "Four of Wands",
+    "meaning": "Celebration, harmony, homecoming, community, joy, stability"
+  },
+  {
+    "slug": "five-of-wands",
+    "name": "Five of Wands",
+    "meaning": "Competition, conflict, tension, diversity of thought, clash of ideas"
+  },
+  {
+    "slug": "six-of-wands",
+    "name": "Six of Wands",
+    "meaning": "Victory, success, public recognition, progress, self-confidence"
+  },
+  {
+    "slug": "seven-of-wands",
+    "name": "Seven of Wands",
+    "meaning": "Challenge, competition, perseverance, standing your ground, defensiveness"
+  },
+  {
+    "slug": "eight-of-wands",
+    "name": "Eight of Wands",
+    "meaning": "Swift action, speed, movement, quick decisions, rapid change, travel"
+  },
+  {
+    "slug": "nine-of-wands",
+    "name": "Nine of Wands",
+    "meaning": "Resilience, grit, persistence, test of faith, boundaries, last stand"
+  },
+  {
+    "slug": "ten-of-wands",
+    "name": "Ten of Wands",
+    "meaning": "Burden, responsibility, hard work, stress, carrying too much, obligation"
+  },
+  {
+    "slug": "page-of-wands",
+    "name": "Page of Wands",
+    "meaning": "Exploration, excitement, freedom, adventure, enthusiastic beginner"
+  },
+  {
+    "slug": "knight-of-wands",
+    "name": "Knight of Wands",
+    "meaning": "Energy, passion, adventure, impulsiveness, action, lust for life"
+  },
+  {
+    "slug": "queen-of-wands",
+    "name": "Queen of Wands",
+    "meaning": "Courage, determination, joy, vibrancy, courage, self-assurance"
+  },
+  {
+    "slug": "king-of-wands",
+    "name": "King of Wands",
+    "meaning": "Natural leader, vision, entrepreneur, honour, boldness, inspiration"
+  },
+  {
+    "slug": "ace-of-cups",
+    "name": "Ace of Cups",
+    "meaning": "New feelings, spirituality, intuition, intimacy, love, compassion"
+  },
+  {
+    "slug": "two-of-cups",
+    "name": "Two of Cups",
+    "meaning": "Unified love, partnership, mutual attraction, connection, balance"
+  },
+  {
+    "slug": "three-of-cups",
+    "name": "Three of Cups",
+    "meaning": "Celebration, friendship, creativity, community, reunion, joy"
+  },
+  {
+    "slug": "four-of-cups",
+    "name": "Four of Cups",
+    "meaning": "Apathy, contemplation, disconnected, missing opportunity, withdrawal"
+  },
+  {
+    "slug": "five-of-cups",
+    "name": "Five of Cups",
+    "meaning": "Loss, grief, regret, sorrow, focusing on the negative, disappointment"
+  },
+  {
+    "slug": "six-of-cups",
+    "name": "Six of Cups",
+    "meaning": "Nostalgia, childhood memories, innocence, joy, reunion, happy past"
+  },
+  {
+    "slug": "seven-of-cups",
+    "name": "Seven of Cups",
+    "meaning": "Choices, fantasy, wishful thinking, illusion, daydreaming, options"
+  },
+  {
+    "slug": "eight-of-cups",
+    "name": "Eight of Cups",
+    "meaning": "Walking away, disillusionment, leaving behind, withdrawal, seeking truth"
+  },
+  {
+    "slug": "nine-of-cups",
+    "name": "Nine of Cups",
+    "meaning": "Contentment, satisfaction, gratitude, wish fulfillment, abundance"
+  },
+  {
+    "slug": "ten-of-cups",
+    "name": "Ten of Cups",
+    "meaning": "Divine love, harmony, fulfillment, family, happy ending, alignment"
+  },
+  {
+    "slug": "page-of-cups",
+    "name": "Page of Cups",
+    "meaning": "Creative opportunity, intuitive messages, curiosity, inner child"
+  },
+  {
+    "slug": "knight-of-cups",
+    "name": "Knight of Cups",
+    "meaning": "Romance, charm, imagination, being swept away, idealism, gentleness"
+  },
+  {
+    "slug": "queen-of-cups",
+    "name": "Queen of Cups",
+    "meaning": "Compassion, calm, comfort, emotional intelligence, intuition, nurturing"
+  },
+  {
+    "slug": "king-of-cups",
+    "name": "King of Cups",
+    "meaning": "Emotional balance, generosity, diplomacy, control of feelings, wisdom"
+  },
+  {
+    "slug": "ace-of-swords",
+    "name": "Ace of Swords",
+    "meaning": "Clarity, breakthroughs, new ideas, mental force, truth, justice"
+  },
+  {
+    "slug": "two-of-swords",
+    "name": "Two of Swords",
+    "meaning": "Difficult decisions, stalemate, indecision, blocked emotions, avoidance"
+  },
+  {
+    "slug": "three-of-swords",
+    "name": "Three of Swords",
+    "meaning": "Heartbreak, grief, sorrow, painful truth, loss, emotional pain"
+  },
+  {
+    "slug": "four-of-swords",
+    "name": "Four of Swords",
+    "meaning": "Rest, restoration, contemplation, recuperation, passive, stillness"
+  },
+  {
+    "slug": "five-of-swords",
+    "name": "Five of Swords",
+    "meaning": "Conflict, defeat, winning at all costs, betrayal, hollow victory"
+  },
+  {
+    "slug": "six-of-swords",
+    "name": "Six of Swords",
+    "meaning": "Transition, change, moving on, release, travel, calmer waters ahead"
+  },
+  {
+    "slug": "seven-of-swords",
+    "name": "Seven of Swords",
+    "meaning": "Deception, trickery, tactics, strategy, sneakiness, betrayal"
+  },
+  {
+    "slug": "eight-of-swords",
+    "name": "Eight of Swords",
+    "meaning": "Imprisonment, restriction, self-imposed limits, victimhood, confusion"
+  },
+  {
+    "slug": "nine-of-swords",
+    "name": "Nine of Swords",
+    "meaning": "Anxiety, worry, fear, depression, nightmares, despair, guilt"
+  },
+  {
+    "slug": "ten-of-swords",
+    "name": "Ten of Swords",
+    "meaning": "Painful ending, betrayal, crisis, loss, rock bottom, backstabbing"
+  },
+  {
+    "slug": "page-of-swords",
+    "name": "Page of Swords",
+    "meaning": "New ideas, curiosity, thirst for knowledge, new ways of communicating"
+  },
+  {
+    "slug": "knight-of-swords",
+    "name": "Knight of Swords",
+    "meaning": "Ambitious, action-oriented, driven, fast-thinking, authoritative"
+  },
+  {
+    "slug": "queen-of-swords",
+    "name": "Queen of Swords",
+    "meaning": "Independent, unbiased, clear thinking, direct, perceptive, honest"
+  },
+  {
+    "slug": "king-of-swords",
+    "name": "King of Swords",
+    "meaning": "Mental clarity, intellectual power, authority, truth, integrity"
+  },
+  {
+    "slug": "ace-of-pentacles",
+    "name": "Ace of Pentacles",
+    "meaning": "New financial opportunity, prosperity, abundance, security, manifestation"
+  },
+  {
+    "slug": "two-of-pentacles",
+    "name": "Two of Pentacles",
+    "meaning": "Balance, adaptability, time management, juggling priorities, flexibility"
+  },
+  {
+    "slug": "three-of-pentacles",
+    "name": "Three of Pentacles",
+    "meaning": "Teamwork, collaboration, skill, building, learning, implementation"
+  },
+  {
+    "slug": "four-of-pentacles",
+    "name": "Four of Pentacles",
+    "meaning": "Conservation, security, frugality, control, savings, possessiveness"
+  },
+  {
+    "slug": "five-of-pentacles",
+    "name": "Five of Pentacles",
+    "meaning": "Financial loss, poverty, hardship, isolation, worry, need"
+  },
+  {
+    "slug": "six-of-pentacles",
+    "name": "Six of Pentacles",
+    "meaning": "Generosity, giving and receiving, charity, sharing wealth, power dynamics"
+  },
+  {
+    "slug": "seven-of-pentacles",
+    "name": "Seven of Pentacles",
+    "meaning": "Patience, perseverance, investment, long-term vision, sustainable effort"
+  },
+  {
+    "slug": "eight-of-pentacles",
+    "name": "Eight of Pentacles",
+    "meaning": "Diligence, mastery, skill development, craft, dedication, apprenticeship"
+  },
+  {
+    "slug": "nine-of-pentacles",
+    "name": "Nine of Pentacles",
+    "meaning": "Abundance, luxury, self-reliance, financial independence, refinement"
+  },
+  {
+    "slug": "ten-of-pentacles",
+    "name": "Ten of Pentacles",
+    "meaning": "Wealth, legacy, inheritance, family, establishment, long-term success"
+  },
+  {
+    "slug": "page-of-pentacles",
+    "name": "Page of Pentacles",
+    "meaning": "Manifestation, financial opportunity, new ambitions, studiousness"
+  },
+  {
+    "slug": "knight-of-pentacles",
+    "name": "Knight of Pentacles",
+    "meaning": "Efficiency, routine, conservatism, methodical, determined, reliable"
+  },
+  {
+    "slug": "queen-of-pentacles",
+    "name": "Queen of Pentacles",
+    "meaning": "Practical, homebody, down-to-earth, nurturing, financial security"
+  },
+  {
+    "slug": "king-of-pentacles",
+    "name": "King of Pentacles",
+    "meaning": "Wealth, security, discipline, abundance, provider, enterprise, leadership"
+  }
+];
+
+// ── State ─────────────────────────────────────────────────────────────────
+let titleAnimated = false;
+let modalOpen = false;
+
+// ── DOM refs ──────────────────────────────────────────────────────────────
+const $home = document.getElementById('home');
+const $reading = document.getElementById('reading');
+const $spread = document.getElementById('spread');
+const $startOver = document.getElementById('startOver');
+const $modal = document.getElementById('modal');
+const $modalPanel = document.getElementById('modalPanel');
+const $modalImg = document.getElementById('modalImg');
+const $modalPosition = document.getElementById('modalPosition');
+const $modalName = document.getElementById('modalName');
+const $modalMeaning = document.getElementById('modalMeaning');
+const $modalKeywords = document.getElementById('modalKeywords');
+
+// ── Utility ───────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function ms(val) { return prefersReducedMotion ? 0 : val; }
+
+// ── Card back SVG HTML ────────────────────────────────────────────────────
+function cardBackHTML() {
+  const svg = document.getElementById('cardBackSvg');
+  return svg.outerHTML.replace('style="display:none"', '').replace('id="cardBackSvg"', '');
+}
+const CARD_BACK_SVG = cardBackHTML();
+
+// ── Particle canvas ───────────────────────────────────────────────────────
+(function initParticles() {
+  if (prefersReducedMotion) return;
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const glyphs = ['\u2726','\u22C6','\u2727','\u2022'];
+  const count = 40 + Math.floor(Math.random() * 21); // 40-60
+  const particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      glyph: glyphs[Math.floor(Math.random() * glyphs.length)],
+      speed: 0.15 + Math.random() * 0.35,
+      sway: 20 + Math.random() * 40,
+      swaySpeed: 0.0004 + Math.random() * 0.0008,
+      phase: Math.random() * Math.PI * 2,
+      maxOpacity: 0.06 + Math.random() * 0.12,
+      opacitySpeed: 0.0003 + Math.random() * 0.0006,
+      opacityPhase: Math.random() * Math.PI * 2,
+      size: 8 + Math.random() * 6,
+    });
+  }
+
+  let lastTime = performance.now();
+  function animate(now) {
+    const dt = now - lastTime; lastTime = now;
+    ctx.clearRect(0, 0, W, H);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const p of particles) {
+      p.y -= p.speed * (dt / 16);
+      if (p.y < -20) { p.y = H + 20; p.x = Math.random() * W; }
+      const sx = Math.sin(now * p.swaySpeed + p.phase) * p.sway;
+      const opacity = p.maxOpacity * (0.5 + 0.5 * Math.sin(now * p.opacitySpeed + p.opacityPhase));
+      ctx.globalAlpha = Math.min(opacity, 0.18);
+      ctx.font = p.size + 'px serif';
+      ctx.fillStyle = '#e8e0d0';
+      ctx.fillText(p.glyph, p.x + sx, p.y);
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+})();
+
+// ── Title entrance ────────────────────────────────────────────────────────
+function animateTitle() {
+  if (titleAnimated) return;
+  titleAnimated = true;
+  const el = document.getElementById('title');
+  const text = 'Bird Tarot';
+  el.innerHTML = '';
+  for (const ch of text) {
+    const span = document.createElement('span');
+    span.className = 'char';
+    span.textContent = ch === ' ' ? '\u00A0' : ch;
+    el.appendChild(span);
+  }
+  const chars = el.querySelectorAll('.char');
+  chars.forEach((c, i) => {
+    setTimeout(() => c.classList.add('visible'), ms(i * 40));
+  });
+  const totalLetterTime = ms(text.length * 40);
+  setTimeout(() => document.getElementById('subtitle').classList.add('visible'), totalLetterTime + ms(400));
+  setTimeout(() => document.getElementById('btnRow').classList.add('visible'), totalLetterTime + ms(600));
+}
+
+// ── State transitions ─────────────────────────────────────────────────────
+function showHome() {
+  $reading.classList.add('fade-out');
+  setTimeout(() => {
+    $reading.classList.add('hidden');
+    $reading.classList.remove('fade-out');
+    $spread.innerHTML = '';
+    $startOver.classList.remove('visible');
+    $home.classList.remove('hidden');
+    // Don't re-animate title, just show it
+    if (titleAnimated) {
+      document.getElementById('title').querySelectorAll('.char').forEach(c => c.classList.add('visible'));
+      document.getElementById('subtitle').classList.add('visible');
+      document.getElementById('btnRow').classList.add('visible');
+    }
+    $home.classList.add('fade-in');
+    setTimeout(() => $home.classList.remove('fade-in'), ms(300));
+  }, ms(400));
+}
+
+function showReading() {
+  $home.classList.add('hidden');
+  $reading.classList.remove('hidden');
+  $reading.style.opacity = '1';
+  $reading.style.transform = 'translateY(0)';
+}
+
+// ── Card slot builder ─────────────────────────────────────────────────────
+function createCardSlot(card, positionLabel) {
+  const slot = document.createElement('div');
+  slot.className = 'card-slot';
+
+  const label = document.createElement('div');
+  label.className = 'position-label';
+  label.textContent = positionLabel || '';
+  slot.appendChild(label);
+
+  const inner = document.createElement('div');
+  inner.className = 'card-inner';
+  inner.setAttribute('role', 'button');
+  inner.setAttribute('tabindex', '0');
+  inner.setAttribute('aria-label', 'Flip ' + (positionLabel || 'card'));
+
+  const back = document.createElement('div');
+  back.className = 'card-face card-back';
+  back.innerHTML = CARD_BACK_SVG;
+  inner.appendChild(back);
+
+  const front = document.createElement('div');
+  front.className = 'card-face card-front';
+  const img = document.createElement('img');
+  img.src = 'cards/' + card.slug + '.png';
+  img.alt = card.name;
+  img.loading = 'lazy';
+  front.appendChild(img);
+  inner.appendChild(front);
+
+  slot.appendChild(inner);
+
+  const info = document.createElement('div');
+  info.className = 'card-info';
+  slot.appendChild(info);
+
+  slot._card = card;
+  slot._inner = inner;
+  slot._info = info;
+  slot._positionLabel = positionLabel;
+  return slot;
+}
+
+// ── Flip a single card ────────────────────────────────────────────────────
+async function flipCard(slot) {
+  const inner = slot._inner;
+  if (inner.classList.contains('flipped')) return;
+
+  // Lift
+  inner.style.animation = 'none';
+  inner.classList.add('lifting');
+  await sleep(ms(150));
+
+  // Flip
+  inner.classList.remove('lifting');
+  inner.classList.add('flipped');
+  await sleep(ms(600));
+
+  // Land
+  inner.classList.add('landed');
+  inner.classList.add('pulse');
+  setTimeout(() => inner.classList.remove('pulse'), 600);
+}
+
+// ── Reveal info for single draw ───────────────────────────────────────────
+async function revealSingleInfo(slot) {
+  const card = slot._card;
+  const info = slot._info;
+
+  // Name
+  const nameEl = document.createElement('div');
+  nameEl.className = 'card-name';
+  nameEl.textContent = card.name;
+  info.appendChild(nameEl);
+  await sleep(ms(50));
+  nameEl.classList.add('visible');
+  await sleep(ms(200));
+
+  // Meaning lines
+  if (card.meaning) {
+    const meaningEl = document.createElement('div');
+    meaningEl.className = 'card-meaning';
+    const lines = card.meaning.split(', ');
+    lines.forEach(l => {
+      const span = document.createElement('span');
+      span.className = 'line';
+      span.textContent = l;
+      meaningEl.appendChild(span);
+    });
+    info.appendChild(meaningEl);
+    await sleep(ms(100));
+    const lineEls = meaningEl.querySelectorAll('.line');
+    for (let i = 0; i < lineEls.length; i++) {
+      setTimeout(() => lineEls[i].classList.add('visible'), ms(i * 60));
+    }
+    await sleep(ms(lineEls.length * 60 + 100));
+  }
+
+  // Keywords
+  if (card.keywords && card.keywords.length) {
+    const kwEl = document.createElement('div');
+    kwEl.className = 'card-keywords';
+    card.keywords.forEach(kw => {
+      const pill = document.createElement('span');
+      pill.className = 'pill';
+      pill.textContent = kw;
+      kwEl.appendChild(pill);
+    });
+    info.appendChild(kwEl);
+    await sleep(ms(80));
+    kwEl.querySelectorAll('.pill').forEach((p, i) => {
+      setTimeout(() => p.classList.add('visible'), ms(i * 80));
+    });
+  }
+}
+
+// ── Draw One ──────────────────────────────────────────────────────────────
+async function drawOne() {
+  showReading();
+  const deck = shuffle(CARDS);
+  const card = deck[0];
+  const slot = createCardSlot(card, '');
+  $spread.appendChild(slot);
+
+  // Deal animation
+  await sleep(ms(50));
+  slot.classList.add('dealt');
+
+  // Pause then flip
+  await sleep(ms(300));
+  await flipCard(slot);
+
+  // Reveal info
+  await revealSingleInfo(slot);
+
+  // Start over
+  await sleep(ms(800));
+  $startOver.classList.add('visible');
+}
+
+// ── Draw Three ────────────────────────────────────────────────────────────
+async function drawThree() {
+  showReading();
+  const deck = shuffle(CARDS);
+  const positions = ['Past', 'Present', 'Future'];
+  const slots = [];
+
+  for (let i = 0; i < 3; i++) {
+    const slot = createCardSlot(deck[i], positions[i]);
+    $spread.appendChild(slot);
+    slots.push(slot);
+  }
+
+  // Deal entrance stagger
+  for (let i = 0; i < 3; i++) {
+    await sleep(ms(120));
+    slots[i].classList.add('dealt');
+  }
+
+  // Pause
+  await sleep(ms(300));
+
+  // Flip in sequence
+  for (let i = 0; i < 3; i++) {
+    flipCard(slots[i]);
+    await sleep(ms(150));
+  }
+  // Wait for last flip to finish
+  await sleep(ms(600));
+
+  // Make cards clickable for modal (three-card only)
+  slots.forEach(slot => {
+    const openModal = () => {
+      const c = slot._card;
+      $modalImg.src = 'cards/' + c.slug + '.png';
+      $modalImg.alt = c.name;
+      $modalPosition.textContent = slot._positionLabel;
+      $modalName.textContent = c.name;
+      $modalMeaning.textContent = c.meaning || '';
+      $modalKeywords.innerHTML = '';
+      if (c.keywords && c.keywords.length) {
+        c.keywords.forEach(kw => {
+          const pill = document.createElement('span');
+          pill.className = 'pill visible';
+          pill.textContent = kw;
+          $modalKeywords.appendChild(pill);
+        });
+      }
+      $modal.classList.add('open');
+      modalOpen = true;
+    };
+    slot._inner.addEventListener('click', openModal);
+    slot._inner.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(); });
+  });
+
+  // Start over
+  await sleep(ms(800));
+  $startOver.classList.add('visible');
+}
+
+// ── Modal dismiss ─────────────────────────────────────────────────────────
+function closeModal() {
+  $modal.classList.remove('open');
+  modalOpen = false;
+}
+$modal.addEventListener('click', e => { if (e.target === $modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && modalOpen) closeModal(); });
+
+// ── Wire up buttons ───────────────────────────────────────────────────────
+document.getElementById('drawOne').addEventListener('click', drawOne);
+document.getElementById('drawThree').addEventListener('click', drawThree);
+$startOver.addEventListener('click', () => { closeModal(); showHome(); });
+
+// ── Init ──────────────────────────────────────────────────────────────────
+animateTitle();
+</script>
+</body>
+</html>
