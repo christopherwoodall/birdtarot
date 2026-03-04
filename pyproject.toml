@@ -32,6 +32,7 @@ bird-tarot       = "bird_tarot.generate:main"
 bird-tarot-local = "bird_tarot.generate_local:main"
 bird-tarot-read   = "bird_tarot.read:main"
 bird-tarot-format = "bird_tarot.format_cards:main"
+bird-tarot-site   = "bird_tarot.build_site:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["bird_tarot"]
