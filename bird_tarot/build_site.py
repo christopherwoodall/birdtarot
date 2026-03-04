@@ -232,6 +232,7 @@ a{{color:inherit;text-decoration:none}}
 .card-front img{{
   width:100%;height:100%;object-fit:cover;display:block;border-radius:7px;
 }}
+.card-front img.card-reversed{{transform:rotate(180deg)}}
 
 /* revealed card lift + glow */
 .card-inner.flipped.landed .card-front{{
@@ -246,6 +247,14 @@ a{{color:inherit;text-decoration:none}}
   transition:opacity .2s ease,transform .2s ease;
 }}
 .card-name.visible{{opacity:1;transform:translateY(0)}}
+.card-orientation{{
+  font-family:'Cinzel',serif;font-variant:small-caps;
+  color:var(--muted);font-size:.75rem;letter-spacing:.1em;
+  margin-bottom:.15rem;
+  opacity:0;transform:translateY(6px);
+  transition:opacity .2s ease,transform .2s ease;
+}}
+.card-orientation.visible{{opacity:1;transform:translateY(0)}}
 .card-meaning{{
   font-family:'EB Garamond',serif;font-size:.97rem;color:var(--text);
   line-height:1.55;margin-top:.4rem;
@@ -540,9 +549,10 @@ function showReading() {{
 }}
 
 // ── Card slot builder ─────────────────────────────────────────────────────
-function createCardSlot(card, positionLabel) {{
+function createCardSlot(card, positionLabel, isReversed) {{
   const slot = document.createElement('div');
   slot.className = 'card-slot';
+  slot._reversed = !!isReversed;
 
   const label = document.createElement('div');
   label.className = 'position-label';
@@ -566,6 +576,7 @@ function createCardSlot(card, positionLabel) {{
   img.src = 'cards/' + card.slug + '.png';
   img.alt = card.name;
   img.loading = 'lazy';
+  if (isReversed) img.classList.add('card-reversed');
   front.appendChild(img);
   inner.appendChild(front);
 
@@ -603,10 +614,20 @@ async function flipCard(slot) {{
   setTimeout(() => inner.classList.remove('pulse'), 600);
 }}
 
-// ── Reveal info for single draw ───────────────────────────────────────────
+// ── Reveal info for a card ─────────────────────────────────────────────────
 async function revealSingleInfo(slot) {{
   const card = slot._card;
   const info = slot._info;
+  const isRev = slot._reversed;
+  const meaning = isRev ? card.reversed : card.meaning;
+
+  // Orientation label
+  const orientEl = document.createElement('div');
+  orientEl.className = 'card-orientation';
+  orientEl.textContent = isRev ? 'Reversed' : 'Upright';
+  info.appendChild(orientEl);
+  await sleep(ms(30));
+  orientEl.classList.add('visible');
 
   // Name
   const nameEl = document.createElement('div');
@@ -618,10 +639,10 @@ async function revealSingleInfo(slot) {{
   await sleep(ms(200));
 
   // Meaning lines
-  if (card.meaning) {{
+  if (meaning) {{
     const meaningEl = document.createElement('div');
     meaningEl.className = 'card-meaning';
-    const lines = card.meaning.split(', ');
+    const lines = meaning.split(', ');
     lines.forEach(l => {{
       const span = document.createElement('span');
       span.className = 'line';
@@ -660,7 +681,8 @@ async function drawOne() {{
   showReading();
   const deck = shuffle(CARDS);
   const card = deck[0];
-  const slot = createCardSlot(card, '');
+  const isReversed = Math.random() < 0.5;
+  const slot = createCardSlot(card, '', isReversed);
   $spread.appendChild(slot);
 
   // Deal animation
@@ -687,7 +709,8 @@ async function drawThree() {{
   const slots = [];
 
   for (let i = 0; i < 3; i++) {{
-    const slot = createCardSlot(deck[i], positions[i]);
+    const isReversed = Math.random() < 0.5;
+    const slot = createCardSlot(deck[i], positions[i], isReversed);
     $spread.appendChild(slot);
     slots.push(slot);
   }}
@@ -709,7 +732,7 @@ async function drawThree() {{
   // Wait for last flip to finish
   await sleep(ms(600));
 
-  // Reveal upright meaning inline below each card
+  // Reveal meaning inline below each card (upright or reversed per orientation)
   for (let i = 0; i < 3; i++) {{
     if (i > 0) await sleep(ms(150));
     revealSingleInfo(slots[i]);
